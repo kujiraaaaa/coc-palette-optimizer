@@ -27,7 +27,6 @@ function optimizePalette(text: string): string {
   if (!text.trim()) return ""; // 空なら何もしない
 
   const lines = text.split('\n');
-  const stats: { [key: string]: number } = {};
   const skills: { [key: string]: number } = {};
   let san = 0;
 
@@ -49,13 +48,6 @@ function optimizePalette(text: string): string {
       return;
     }
 
-    // 能力値×5ロール
-    match = line.match(/CCB<=(\d+)\*5 【(STR|CON|POW|DEX|APP|SIZ|INT|EDU) × 5】/);
-    if(match) {
-      stats[match[2]] = parseInt(match[1]);
-      return;
-    }
-
     // 通常技能ロール
     match = line.match(/CCB<=(\d+)\s*【(.+)】/);
     if(match) {
@@ -74,14 +66,14 @@ function optimizePalette(text: string): string {
   if (san > 0) result.push("1d100<={SAN} 【正気度ロール】");
   result.push("---");
   
-  if(stats.STR) result.push(`CCB<={STR}*5 【STR×5】`);
-  if(stats.CON) result.push(`CCB<={CON}*5 【CON×5】（ショックロール）`);
-  if(stats.POW) result.push(`CCB<={POW}*5 【POW×5】（幸運）`);
-  if(stats.DEX) result.push(`CCB<={DEX}*5 【DEX×5】`);
-  if(stats.APP) result.push(`CCB<={APP}*5 【APP×5】`);
-  if(stats.SIZ) result.push(`CCB<={SIZ}*5 【SIZ×5】`);
-  if(stats.INT) result.push(`CCB<={INT}*5 【INT×5】（アイデア）`);
-  if(stats.EDU) result.push(`CCB<={EDU}*5 【EDU×5】（知識・母国語）`);
+  result.push(`CCB<={STR}*5 【STR×5】`);
+  result.push(`CCB<={CON}*5 【CON×5】（ショックロール）`);
+  result.push(`CCB<={POW}*5 【POW×5】（幸運）`);
+  result.push(`CCB<={DEX}*5 【DEX×5】`);
+  result.push(`CCB<={APP}*5 【APP×5】`);
+  result.push(`CCB<={SIZ}*5 【SIZ×5】`);
+  result.push(`CCB<={INT}*5 【INT×5】（アイデア）`);
+  result.push(`CCB<={EDU}*5 【EDU×5】（知識・母国語）`);
   
   result.push("---");
 
