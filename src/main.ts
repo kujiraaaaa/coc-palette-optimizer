@@ -124,7 +124,7 @@ function optimizePalette(text: string): string {
   result.push("---");
   result.push("choice[A,B,C]");
   result.push("---");
-  result.push("・パラメータ操作\n:SAN\n:HP\n:MP");
+  result.push("・ステータス操作\n:SAN\n:HP\n:MP");
 
   return result.join('\n');
 }
