@@ -81,14 +81,14 @@ function optimizePalette(text: string): string {
   if (san > 0) result.push("1d100<={SAN} 【正気度ロール】");
   result.push("---");
   
-  if(stats.STR) result.push(`CCB<=${stats.STR}*5 【STR×5】`);
-  if(stats.CON) result.push(`CCB<=${stats.CON}*5 【CON×5】（ショックロール）`);
-  if(stats.POW) result.push(`CCB<=${stats.POW}*5 【POW×5】（幸運）`);
-  if(stats.DEX) result.push(`CCB<=${stats.DEX}*5 【DEX×5】`);
-  if(stats.APP) result.push(`CCB<=${stats.APP}*5 【APP×5】`);
-  if(stats.SIZ) result.push(`CCB<=${stats.SIZ}*5 【SIZ×5】`);
-  if(stats.INT) result.push(`CCB<=${stats.INT}*5 【INT×5】（アイデア）`);
-  if(stats.EDU) result.push(`CCB<=${stats.EDU}*5 【EDU×5】（知識・母国語）`);
+  if(stats.STR) result.push(`CCB<={STR}*5 【STR×5】`);
+  if(stats.CON) result.push(`CCB<={CON}*5 【CON×5】（ショックロール）`);
+  if(stats.POW) result.push(`CCB<={POW}*5 【POW×5】（幸運）`);
+  if(stats.DEX) result.push(`CCB<={DEX}*5 【DEX×5】`);
+  if(stats.APP) result.push(`CCB<={APP}*5 【APP×5】`);
+  if(stats.SIZ) result.push(`CCB<={SIZ}*5 【SIZ×5】`);
+  if(stats.INT) result.push(`CCB<={INT}*5 【INT×5】（アイデア）`);
+  if(stats.EDU) result.push(`CCB<={EDU}*5 【EDU×5】（知識・母国語）`);
   
   result.push("---");
 
@@ -113,14 +113,23 @@ function optimizePalette(text: string): string {
   result.push(...otherSkills);
   result.push("---");
   
-  if(db) {
-    result.push(`1D3+${db} 【こぶしダメージ判定】`);
-    if (skills['マーシャルアーツ'] > 1) result.push(`2D3+${db} 【こぶし+マーシャルアーツダメージ判定】`);
-    result.push(`1D6+${db} 【キックダメージ判定】`);
-    if (skills['マーシャルアーツ'] > 1) result.push(`2D6+${db} 【キック+マーシャルアーツダメージ判定】`);
+  // ダメージロールは{DB}がココフォリアで管理されるため、常に追加
+  result.push(`1D3+{DB} 【こぶしダメージ判定】`);
+  result.push(`1D6+{DB} 【キックダメージ判定】`);
+
+  // マーシャルアーツは技能値を振っている（初期値1より大きい）場合のみ追加
+  if (skills['マーシャルアーツ'] > initialSkills['マーシャルアーツ']) {
+      result.push(`2D3+{DB} 【こぶし+マーシャルアーツダメージ判定】`);
+      result.push(`2D6+{DB} 【キック+マーシャルアーツダメージ判定】`);
   }
-  if(skills['応急手当']) result.push("1D3 【応急手当回復値判定】");
-  if(skills['医学']) result.push("2D3 【医学回復値判定】");
+
+  // 応急手当は初期値(30)でも使うため、常に追加
+  result.push("1D3 【応急手当回復値判定】");
+
+  // 医学は技能値を振っている（初期値5より大きい）場合のみ追加
+  if (skills['医学'] > initialSkills['医学']) {
+      result.push("2D3 【医学回復値判定】");
+  }
   
   result.push("---");
   result.push("CCB<=");
