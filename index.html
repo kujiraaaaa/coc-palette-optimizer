@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CoC6版 チャットパレット最適化ツール</title>
+  </head>
+  <body>
+    <h1>CoC6版 チャットパレット最適化ツール</h1>
+    <p>「いあきゃら」のチャットパレット出力を貼り付けてください。</p>
+    
+    <div class="container">
+      <div class="editor">
+        <h2>入力</h2>
+        <textarea id="input-palette" rows="20"></textarea>
+      </div>
+      <div class="actions">
+        <button id="optimize-button">最適化 →</button>
+      </div>
+      <div class="editor">
+        <h2>出力</h2>
+        <textarea id="output-palette" rows="20" readonly></textarea>
+        <button id="copy-button">クリップボードにコピー</button>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

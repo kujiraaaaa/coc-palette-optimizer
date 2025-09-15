@@ -1,0 +1,137 @@
+import './style.css'
+
+// HTMLの要素を取得
+const inputArea = document.getElementById('input-palette') as HTMLTextAreaElement;
+const outputArea = document.getElementById('output-palette') as HTMLTextAreaElement;
+const optimizeButton = document.getElementById('optimize-button') as HTMLButtonElement;
+const copyButton = document.getElementById('copy-button') as HTMLButtonElement;
+
+// 「最適化」ボタンが押されたときの処理
+optimizeButton.addEventListener('click', () => {
+  const inputText = inputArea.value;
+  // ここに最適化のロジックを書く（まだ空）
+  const outputText = optimizePalette(inputText); 
+  outputArea.value = outputText;
+});
+
+// 「コピー」ボタンが押されたときの処理
+copyButton.addEventListener('click', () => {
+  outputArea.select();
+  navigator.clipboard.writeText(outputArea.value)
+    .then(() => alert('コピーしました！'))
+    .catch(err => alert('コピーに失敗しました: ' + err));
+});
+
+// --- ここからがチャットパレット最適化のメインロジック ---
+function optimizePalette(text: string): string {
+  if (!text.trim()) return ""; // 空なら何もしない
+
+  const lines = text.split('\n');
+  const stats: { [key: string]: number } = {};
+  const skills: { [key: string]: number } = {};
+  let san = 0;
+  let db = "";
+
+  // CoC6版の技能初期値リスト
+  const initialSkills: { [key: string]: number } = {
+    '回避': 0, 'キック': 25, '組み付き': 25, 'こぶし（パンチ）': 50, '頭突き': 10, '投擲': 25, 'マーシャルアーツ': 1, '拳銃': 20, 'サブマシンガン': 15, 'ショットガン': 30, 'マシンガン': 15, 'ライフル': 25,
+    '応急手当': 30, '鍵開け': 1, '隠す': 15, '隠れる': 10, '聞き耳': 25, '忍び歩き': 10, '写真術': 10, '精神分析': 1, '追跡': 10, '登攀': 40, '図書館': 25, '目星': 25,
+    '運転': 20, '機械修理': 20, '重機械操作': 1, '乗馬': 5, '水泳': 25, '製作': 5, '操縦': 1, '跳躍': 25, '電気修理': 10, 'ナビゲート': 10, '変装': 1,
+    '言いくるめ': 5, '信用': 15, '説得': 15, '値切り': 5, '母国語': 0,
+    '医学': 5, 'オカルト': 5, '化学': 1, 'クトゥルフ神話': 0, '芸術': 5, '経理': 10, '考古学': 1, 'コンピューター': 1, '心理学': 5, '人類学': 1, '生物学': 1, '地質学': 1, '電子工学': 1, '天文学': 1, '博物学': 10, '物理学': 1, '法律': 5, '薬学': 1, '歴史': 20,
+  };
+  
+  // 1. 全行を解析して能力値と技能を抽出
+  lines.forEach(line => {
+    // 正気度ロール
+    let match = line.match(/1d100<={SAN}\s*.*【正気度ロール】/);
+    if(match) {
+      san = 1; // SANの行があったことを記録
+      return;
+    }
+
+    // 能力値×5ロール
+    match = line.match(/CCB<=(\d+)\*5 【(STR|CON|POW|DEX|APP|SIZ|INT|EDU) × 5】/);
+    if(match) {
+      stats[match[2]] = parseInt(match[1]);
+      return;
+    }
+
+    // 通常技能ロール
+    match = line.match(/CCB<=(\d+)\s*【(.+)】/);
+    if(match) {
+      const skillName = match[2];
+      const skillValue = parseInt(match[1]);
+      
+      // 「アイデア」「幸運」「知識」は能力値ロールなので技能リストから除外
+      if(!['アイデア', '幸運', '知識'].includes(skillName)) {
+        skills[skillName] = skillValue;
+      }
+    }
+
+    // ダメージボーナス判定
+    match = line.match(/1d\d\+1D\d/);
+    if(match) {
+      db = "{DB}"; // DBは固定文字列で扱う
+    }
+  });
+
+  // 2. 抽出したデータを使って新しいパレットを組み立てる
+  const result: string[] = [];
+  if (san > 0) result.push("1d100<={SAN} 【正気度ロール】");
+  result.push("---");
+  
+  if(stats.STR) result.push(`CCB<=${stats.STR}*5 【STR×5】`);
+  if(stats.CON) result.push(`CCB<=${stats.CON}*5 【CON×5】（ショックロール）`);
+  if(stats.POW) result.push(`CCB<=${stats.POW}*5 【POW×5】（幸運）`);
+  if(stats.DEX) result.push(`CCB<=${stats.DEX}*5 【DEX×5】`);
+  if(stats.APP) result.push(`CCB<=${stats.APP}*5 【APP×5】`);
+  if(stats.SIZ) result.push(`CCB<=${stats.SIZ}*5 【SIZ×5】`);
+  if(stats.INT) result.push(`CCB<=${stats.INT}*5 【INT×5】（アイデア）`);
+  if(stats.EDU) result.push(`CCB<=${stats.EDU}*5 【EDU×5】（知識・母国語）`);
+  
+  result.push("---");
+
+  // 技能を「初期値より高いもの」と「それ以外」に分類
+  const grownSkills: string[] = [];
+  const otherSkills: string[] = [];
+  
+  for (const skillName in skills) {
+    const value = skills[skillName];
+    const initialValue = initialSkills[skillName.replace(/《.+》/, '')] ?? -1; // 特殊技能《》を除外して検索
+    const line = `CCB<=${value} 【${skillName}】`;
+    
+    if (value > initialValue) {
+      grownSkills.push(line);
+    } else {
+      otherSkills.push(line);
+    }
+  }
+  
+  result.push(...grownSkills);
+  result.push("---");
+  result.push(...otherSkills);
+  result.push("---");
+  
+  if(db) {
+    result.push(`1D3+${db} 【こぶしダメージ判定】`);
+    if (skills['マーシャルアーツ'] > 1) result.push(`2D3+${db} 【こぶし+マーシャルアーツダメージ判定】`);
+    result.push(`1D6+${db} 【キックダメージ判定】`);
+    if (skills['マーシャルアーツ'] > 1) result.push(`2D6+${db} 【キック+マーシャルアーツダメージ判定】`);
+  }
+  if(skills['応急手当']) result.push("1D3 【応急手当回復値判定】");
+  if(skills['医学']) result.push("2D3 【医学回復値判定】");
+  
+  result.push("---");
+  result.push("CCB<=");
+  result.push("---");
+  result.push("・組み合わせロール\nCBRB(x,y)");
+  result.push("---");
+  result.push("・抵抗表ロール\nRESB(x-y)");
+  result.push("---");
+  result.push("choice[A,B,C]");
+  result.push("---");
+  result.push("・パラメータ操作\n:SAN\n:HP\n:MP");
+
+  return result.join('\n');
+}
