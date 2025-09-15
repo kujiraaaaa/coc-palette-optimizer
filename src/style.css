@@ -56,3 +56,66 @@ button {
   border-radius: 3px;
   font-weight: bold;
 }
+
+.feedback-section {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1rem;
+  border-top: 1px solid #ccc;
+}
+
+.feedback-section summary {
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  text-align: center;
+}
+
+.feedback-section details[open] summary {
+  background-color: #e0e0e0;
+}
+
+#feedback-form {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+#feedback-form select,
+#feedback-form textarea {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+#feedback-submit-button {
+  padding: 0.75rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+#feedback-submit-button:hover {
+  background-color: #0056b3;
+}
+#feedback-submit-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
