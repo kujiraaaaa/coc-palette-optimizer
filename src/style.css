@@ -7,7 +7,6 @@ p { text-align: center; color: #555; }
 .container {
   display: flex;
   justify-content: center;
-  align-items: center;
   gap: 1rem;
   padding: 1rem;
 }
