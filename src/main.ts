@@ -30,7 +30,6 @@ function optimizePalette(text: string): string {
   const stats: { [key: string]: number } = {};
   const skills: { [key: string]: number } = {};
   let san = 0;
-  let db = "";
 
   // CoC6版の技能初期値リスト
   const initialSkills: { [key: string]: number } = {
@@ -67,12 +66,6 @@ function optimizePalette(text: string): string {
       if(!['アイデア', '幸運', '知識'].includes(skillName)) {
         skills[skillName] = skillValue;
       }
-    }
-
-    // ダメージボーナス判定
-    match = line.match(/1d\d\+1D\d/);
-    if(match) {
-      db = "{DB}"; // DBは固定文字列で扱う
     }
   });
 
