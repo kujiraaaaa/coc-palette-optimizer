@@ -107,15 +107,14 @@ function optimizePalette(text: string): string {
   result.push("---");
   
   // ダメージロールは{DB}がココフォリアで管理されるため、常に追加
-  result.push(`1D3+{DB} 【こぶしダメージ判定】`);
-  result.push(`1D6+{DB} 【キックダメージ判定】`);
+  result.push(`1D3{DB} 【こぶしダメージ判定】`);
+  result.push(`1D6{DB} 【キックダメージ判定】`);
 
   // マーシャルアーツは技能値を振っている（初期値1より大きい）場合のみ追加
   if (skills['マーシャルアーツ'] > initialSkills['マーシャルアーツ']) {
-      result.push(`2D3+{DB} 【こぶし+マーシャルアーツダメージ判定】`);
-      result.push(`2D6+{DB} 【キック+マーシャルアーツダメージ判定】`);
+      result.push(`2D3{DB} 【こぶし+マーシャルアーツダメージ判定】`);
+      result.push(`2D6{DB} 【キック+マーシャルアーツダメージ判定】`);
   }
-
   // 応急手当は初期値(30)でも使うため、常に追加
   result.push("1D3 【応急手当回復値判定】");
 

@@ -38,3 +38,21 @@ button {
   margin-top: 0.5rem;
   background-color: #28a745;
 }
+.notice {
+  max-width: 800px;
+  margin: 1rem auto;
+  padding: 1rem;
+  border: 1px solid #e0a800;
+  background-color: #fff3cd;
+  color: #664d03;
+  border-radius: 5px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.notice code {
+  background-color: #e9ecef;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-weight: bold;
+}
