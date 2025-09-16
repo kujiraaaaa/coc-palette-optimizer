@@ -1,66 +1,121 @@
+/* 基本的なスタイルリセットと設定 */
 body {
-  font-family: sans-serif;
-  background-color: #f0f0f0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans CJK JP", "Yu Gothic", Meiryo, sans-serif;
+  background-color: #f4f7f9;
+  color: #333;
+  margin: 0;
+  padding: 1rem;
+  box-sizing: border-box;
 }
-h1 { text-align: center; }
-p { text-align: center; color: #555; }
+
+/* 各セクションの最大幅と中央寄せ */
+h1, .notice, .container, .feedback-section {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 見出し */
+h1 {
+  text-align: center;
+  color: #2c3e50;
+}
+
+/* 説明文 */
+p {
+  text-align: center;
+  color: #555;
+}
+
+/* メインのコンテナ（入力と出力エリア） */
 .container {
   display: flex;
   justify-content: center;
   gap: 1rem;
-  padding: 1rem;
+  padding: 1rem 0;
 }
+
+/* テキストエリアのセクション */
 .editor {
   display: flex;
   flex-direction: column;
-  width: 40%;
+  width: 45%;
+  min-width: 280px;
 }
+
+.editor h2 {
+  font-size: 1.1rem;
+  margin-top: 0;
+  text-align: center;
+  color: #34495e;
+}
+
+/* テキストエリア */
 textarea {
   width: 100%;
+  box-sizing: border-box; /* paddingを含めて幅を計算 */
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 4px;
   padding: 8px;
+  resize: vertical; /* 縦方向のみリサイズ可能に */
 }
+
+/* 真ん中のアクションボタン */
 .actions {
   display: flex;
   align-items: center;
 }
+
 button {
   padding: 10px 15px;
   border-radius: 5px;
   border: none;
-  background-color: #007bff;
+  background-color: #3498db;
   color: white;
   cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
+
+button:hover {
+  background-color: #2980b9;
+}
+
+/* コピーボタン */
 #copy-button {
   margin-top: 0.5rem;
-  background-color: #28a745;
+  width: 100%;
+  background-color: #2ecc71;
 }
+#copy-button:hover {
+  background-color: #27ae60;
+}
+
+/* 注意書きセクション */
 .notice {
-  max-width: 800px;
-  margin: 1rem auto;
+  margin-bottom: 2rem;
   padding: 1rem;
-  border: 1px solid #e0a800;
-  background-color: #fff3cd;
-  color: #664d03;
+  border: 1px solid #f1c40f;
+  background-color: #fef9e7;
+  color: #8a6d3b;
   border-radius: 5px;
   text-align: center;
   line-height: 1.6;
 }
 
 .notice code {
-  background-color: #e9ecef;
+  background-color: #fdf2d1;
   padding: 0.2em 0.4em;
   border-radius: 3px;
   font-weight: bold;
 }
 
+/* フィードバックセクション */
 .feedback-section {
   max-width: 600px;
-  margin: 2rem auto;
-  padding: 1rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
   border-top: 1px solid #ccc;
 }
 
@@ -69,12 +124,14 @@ button {
   font-weight: bold;
   padding: 0.5rem;
   border-radius: 4px;
-  background-color: #f0f0f0;
+  background-color: #e0e0e0;
   text-align: center;
+  transition: background-color 0.2s ease;
 }
 
+.feedback-section summary:hover,
 .feedback-section details[open] summary {
-  background-color: #e0e0e0;
+  background-color: #d0d0d0;
 }
 
 #feedback-form {
@@ -104,18 +161,46 @@ button {
 
 #feedback-submit-button {
   padding: 0.75rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
+  background-color: #3498db;
 }
 
 #feedback-submit-button:hover {
-  background-color: #0056b3;
+  background-color: #2980b9;
 }
 #feedback-submit-button:disabled {
-  background-color: #ccc;
+  background-color: #bdc3c7;
   cursor: not-allowed;
+}
+
+
+/* ---------------------------------------------- */
+/* === レスポンシブ対応 (画面幅が768px以下のときに適用) === */
+/* ---------------------------------------------- */
+@media (max-width: 768px) {
+  body {
+    padding: 0.5rem;
+  }
+  
+  h1 {
+    font-size: 1.5rem; /* スマホ用に少しフォントサイズを調整 */
+  }
+
+  .container {
+    /* 横並びを縦並びに変更 */
+    flex-direction: column;
+    align-items: center; /* 中央に寄せる */
+    padding: 0;
+    gap: 0;
+  }
+
+  .editor {
+    /* 幅を画面いっぱいに広げる */
+    width: 95%;
+  }
+
+  .actions button {
+    /* 矢印を90度回転させて「↓」に見せる */
+    transform: rotate(90deg);
+    margin: 1.5rem 0; /* 上下の余白をしっかり取る */
+  }
 }
