@@ -1,5 +1,10 @@
 import './style.css'
 
+// Google Analytics gtag の型定義
+declare global {
+  function gtag(command: 'config' | 'event', targetId: string, config?: any): void;
+}
+
 // Google Analytics 4 のイベント送信関数
 function trackToolUsage() {
   if (typeof gtag !== 'undefined') {
