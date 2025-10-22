@@ -21,6 +21,23 @@ h1 {
   color: #2c3e50;
 }
 
+/* 使用回数カウンター */
+.usage-counter {
+  text-align: center;
+  margin: 2rem auto 0 auto;
+  padding: 0.5rem;
+  background-color: #e8f5e8;
+  border: 1px solid #4caf50;
+  border-radius: 5px;
+  color: #2e7d32;
+  font-weight: bold;
+  max-width: 600px;
+}
+
+#usage-count {
+  font-size: 1rem;
+}
+
 /* 説明文 */
 p {
   text-align: center;
@@ -199,8 +216,6 @@ button:hover {
   }
 
   .actions button {
-    /* 矢印を90度回転させて「↓」に見せる */
-    transform: rotate(90deg);
     margin: 1.5rem 0; /* 上下の余白をしっかり取る */
   }
 }
