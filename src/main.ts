@@ -8,7 +8,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // 最適化ボタン回数カウンターをSupabaseで取得・インクリメント・表示
 async function incrementAndDisplayOptimizeCount() {
   const { data, error } = await supabase
-    .from('counter')
+    .from('usage_stats')
     .select('count')
     .eq('id', 1)
     .single();
@@ -21,7 +21,7 @@ async function incrementAndDisplayOptimizeCount() {
   let currentCount = (data?.count ?? 0) + 1;
 
   const { error: updateError } = await supabase
-    .from('counter')
+    .from('usage_stats')
     .update({ count: currentCount })
     .eq('id', 1);
 
@@ -62,7 +62,7 @@ copyButton.addEventListener('click', () => {
 // ページロード時に現在値のみ表示
 (async () => {
   const { data, error } = await supabase
-    .from('counter')
+    .from('usage_stats')
     .select('count')
     .eq('id', 1)
     .single();
