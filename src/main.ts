@@ -21,35 +21,6 @@ function trackToolUsage() {
   }
 }
 
-// 訪問者数表示の更新
-function updateUsageCounter() {
-  const usageCountElement = document.getElementById('usage-count');
-  if (usageCountElement) {
-    // セッションストレージで今回のセッションでカウント済みかチェック
-    const sessionCounted = sessionStorage.getItem('palette_optimizer_session_counted');
-    
-    if (!sessionCounted) {
-      // 今回のセッションではまだカウントしていない場合のみカウント
-      const visitCount = localStorage.getItem('palette_optimizer_visits');
-      const currentCount = visitCount ? parseInt(visitCount) + 1 : 1;
-      
-      // ローカルストレージに保存
-      localStorage.setItem('palette_optimizer_visits', currentCount.toString());
-      
-      // セッションストレージにカウント済みフラグを設定
-      sessionStorage.setItem('palette_optimizer_session_counted', 'true');
-      
-      // 表示を更新（正直な数値）
-      usageCountElement.textContent = `${currentCount}人に使用されました`;
-    } else {
-      // 既にカウント済みの場合は現在の値を表示
-      const visitCount = localStorage.getItem('palette_optimizer_visits');
-      const currentCount = visitCount ? parseInt(visitCount) : 0;
-      usageCountElement.textContent = `${currentCount}人に使用されました`;
-    }
-  }
-}
-
 // Supabaseグローバルカウンターの取得・インクリメント・表示
 async function incrementAndDisplayCounter() {
   const { data, error } = await supabase
