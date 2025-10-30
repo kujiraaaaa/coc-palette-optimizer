@@ -1,7 +1,7 @@
 import './style.css'
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://zjjdtaoieuvawkufidsd.supabase.co';
+const supabaseUrl = 'https://zjjtdaoieuvakwufisdj.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqanRkYW9pZXV2YWt3dWZpc2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4MDYwMjQsImV4cCI6MjA3NzM4MjAyNH0.a-6wbr7aabX0EutpmM3n_vpuBKzMBXC0Zhok4byRaEM';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
