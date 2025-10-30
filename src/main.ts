@@ -1,4 +1,9 @@
 import './style.css'
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = 'https://zjjdtaoieuvawkufidsd.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqanRkYW9pZXV2YWt3dWZpc2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4MDYwMjQsImV4cCI6MjA3NzM4MjAyNH0.a-6wbr7aabX0EutpmM3n_vpuBKzMBXC0Zhok4byRaEM';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Google Analytics gtag の型定義
 declare global {
@@ -45,10 +50,47 @@ function updateUsageCounter() {
   }
 }
 
+// Supabaseグローバルカウンターの取得・インクリメント・表示
+async function incrementAndDisplayCounter() {
+  const { data, error } = await supabase
+    .from('counter')
+    .select('count')
+    .eq('id', 1)
+    .single();
+
+  if (error) {
+    console.error('カウンター取得エラー', error);
+    displayCounterText('カウンター取得失敗');
+    return;
+  }
+
+  let currentCount = (data?.count ?? 0) + 1;
+
+  const { error: updateError } = await supabase
+    .from('counter')
+    .update({ count: currentCount })
+    .eq('id', 1);
+
+  if (updateError) {
+    console.error('カウンター更新エラー', updateError);
+    displayCounterText('カウント更新失敗');
+    return;
+  }
+
+  displayCounterText(`${currentCount}人に使用されました`);
+}
+
+function displayCounterText(text: string) {
+  const usageCountElement = document.getElementById('usage-count');
+  if (usageCountElement) {
+    usageCountElement.textContent = text;
+  }
+}
+
 // ページ読み込み時にイベントを送信
 document.addEventListener('DOMContentLoaded', () => {
   trackToolUsage();
-  updateUsageCounter();
+  incrementAndDisplayCounter();
 });
 
 // HTMLの要素を取得
@@ -149,7 +191,7 @@ function optimizePalette(text: string): string {
   result.push(...otherSkills);
   result.push("---");
   
-  // ダメージロールは{DB}がココフォリアで管理されるため、常に追加
+  // こぶし・キックは初期値でも使うため、常に追加
   result.push(`1D3{DB} 【こぶしダメージ判定】`);
   result.push(`1D6{DB} 【キックダメージ判定】`);
 
@@ -179,8 +221,6 @@ function optimizePalette(text: string): string {
 
   return result.join('\n');
 }
-// src/main.ts の末尾に以下のコードをすべて追記
-
 // --- ここからがフィードバックフォームのロジック ---
 
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1417163291280674826/p0SVn6ZzLfIdvSpvZZC--d9poPjUayLwih3fO2kaVZFoNtR5ymvCiA3GmGB-Hvu1wLOe';
