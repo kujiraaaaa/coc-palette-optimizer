@@ -21,8 +21,8 @@ function trackToolUsage() {
   }
 }
 
-// Supabaseグローバルカウンターの取得・インクリメント・表示
-async function incrementAndDisplayCounter() {
+// 最適化ボタン回数カウンターをSupabaseで取得・インクリメント・表示
+async function incrementAndDisplayOptimizeCount() {
   const { data, error } = await supabase
     .from('counter')
     .select('count')
@@ -30,8 +30,8 @@ async function incrementAndDisplayCounter() {
     .single();
 
   if (error) {
-    console.error('カウンター取得エラー', error);
-    displayCounterText('カウンター取得失敗');
+    console.error('カウント取得エラー', error);
+    displayOptimizeCountText('カウント取得失敗');
     return;
   }
 
@@ -43,26 +43,31 @@ async function incrementAndDisplayCounter() {
     .eq('id', 1);
 
   if (updateError) {
-    console.error('カウンター更新エラー', updateError);
-    displayCounterText('カウント更新失敗');
+    console.error('カウント更新エラー', updateError);
+    displayOptimizeCountText('カウント更新失敗');
     return;
   }
-
-  displayCounterText(`${currentCount}人に使用されました`);
+  displayOptimizeCountText(`最適化ボタンが${currentCount}回押されました`);
 }
 
-function displayCounterText(text: string) {
-  const usageCountElement = document.getElementById('usage-count');
-  if (usageCountElement) {
-    usageCountElement.textContent = text;
+function displayOptimizeCountText(text: string) {
+  const el = document.getElementById('optimize-count');
+  if (el) el.textContent = text;
+}
+
+async function showOptimizeCountOnly() {
+  const { data, error } = await supabase
+    .from('counter')
+    .select('count')
+    .eq('id', 1)
+    .single();
+  if (error) {
+    displayOptimizeCountText('カウント取得失敗');
+    return;
   }
+  const count = data?.count ?? 0;
+  displayOptimizeCountText(`最適化ボタンが${count}回押されました`);
 }
-
-// ページ読み込み時にイベントを送信
-document.addEventListener('DOMContentLoaded', () => {
-  trackToolUsage();
-  incrementAndDisplayCounter();
-});
 
 // HTMLの要素を取得
 const inputArea = document.getElementById('input-palette') as HTMLTextAreaElement;
@@ -76,6 +81,7 @@ optimizeButton.addEventListener('click', () => {
   // ここに最適化のロジックを書く（まだ空）
   const outputText = optimizePalette(inputText); 
   outputArea.value = outputText;
+  incrementAndDisplayOptimizeCount();
 });
 
 // 「コピー」ボタンが押されたときの処理

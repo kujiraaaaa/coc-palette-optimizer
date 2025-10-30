@@ -21,8 +21,8 @@ h1 {
   color: #2c3e50;
 }
 
-/* 使用回数カウンター */
-.usage-counter {
+/* 最適化ボタンカウンター */
+#optimize-count {
   text-align: center;
   margin: 2rem auto 0 auto;
   padding: 0.5rem;
@@ -32,9 +32,6 @@ h1 {
   color: #2e7d32;
   font-weight: bold;
   max-width: 600px;
-}
-
-#usage-count {
   font-size: 1rem;
 }
 
