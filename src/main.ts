@@ -92,24 +92,40 @@ function optimizePalette(text: string): string {
   };
   
   // 1. 全行を解析して能力値と技能を抽出
+  const abilityNames = new Set([
+    'STR×5','CON×5','POW×5','DEX×5','APP×5','SIZ×5','INT×5','EDU×5',
+    'STR*5','CON*5','POW*5','DEX*5','APP*5','SIZ*5','INT*5','EDU*5',
+    'アイデア','幸運','知識'
+  ]);
+
+  const normalizeSkillNameForInitial = (name: string) => {
+    const withoutBrackets = name.replace(/《.*?》/g, '').replace(/（.*?）/g, '');
+    const trimmed = withoutBrackets.trim();
+    const synonyms: { [key: string]: string } = {
+      'こぶし': 'こぶし（パンチ）',
+      '組みつき': '組み付き',
+    };
+    return synonyms[trimmed] ?? trimmed;
+  };
+
   lines.forEach(line => {
+    const trimmedLine = line.trim();
+    if (!trimmedLine) return;
+
     // 正気度ロール
-    let match = line.match(/1d100<={SAN}\s*.*【正気度ロール】/);
-    if(match) {
-      san = 1; // SANの行があったことを記録
+    if (/1d100<=\{SAN\}/i.test(trimmedLine)) {
+      san = 1;
       return;
     }
 
     // 通常技能ロール
-    match = line.match(/CCB<=(\d+)\s*【(.+)】/);
-    if(match) {
-      const skillName = match[2];
+    const match = trimmedLine.match(/CCB<=\s*(\d+)\s*(?:【([^】]+)】|(.+))/i);
+    if (match) {
+      let skillName = (match[2] ?? match[3] ?? '').trim();
+      if (!skillName || abilityNames.has(skillName)) return;
+
       const skillValue = parseInt(match[1]);
-      
-      // 「アイデア」「幸運」「知識」は能力値ロールなので技能リストから除外
-      if(!['アイデア', '幸運', '知識'].includes(skillName)) {
-        skills[skillName] = skillValue;
-      }
+      skills[skillName] = skillValue;
     }
   });
 
@@ -135,7 +151,8 @@ function optimizePalette(text: string): string {
   
   for (const skillName in skills) {
     const value = skills[skillName];
-    const initialValue = initialSkills[skillName.replace(/《.+》/, '')] ?? -1; // 特殊技能《》を除外して検索
+    const normalizedSkillName = normalizeSkillNameForInitial(skillName);
+    const initialValue = initialSkills[normalizedSkillName] ?? -1; // 特殊技能《》・（ ）を除外して検索
     const line = `CCB<=${value} 【${skillName}】`;
     
     if (value > initialValue) {
