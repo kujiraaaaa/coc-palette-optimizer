@@ -92,11 +92,21 @@ function optimizePalette(text: string): string {
   };
   
   // 1. 全行を解析して能力値と技能を抽出
-  const abilityNames = new Set([
-    'STR×5','CON×5','POW×5','DEX×5','APP×5','SIZ×5','INT×5','EDU×5',
-    'STR*5','CON*5','POW*5','DEX*5','APP*5','SIZ*5','INT*5','EDU*5',
-    'アイデア','幸運','知識'
-  ]);
+  const normalizeAbilityName = (name: string) =>
+    name
+      .replace(/\s+/g, '')
+      .replace(/\*/g, '×')
+      .replace(/[xX]/g, '×');
+
+  const abilityKeywords = new Set(['アイデア','幸運','知識'].map(name => normalizeAbilityName(name)));
+
+  const isAbilityRoll = (name: string) => {
+    const normalized = normalizeAbilityName(name);
+    if (/^(STR|CON|POW|DEX|APP|SIZ|INT|EDU)×5$/i.test(normalized)) {
+      return true;
+    }
+    return abilityKeywords.has(normalized);
+  };
 
   const normalizeSkillNameForInitial = (name: string) => {
     const withoutBrackets = name.replace(/《.*?》/g, '').replace(/（.*?）/g, '');
@@ -122,7 +132,24 @@ function optimizePalette(text: string): string {
     const match = trimmedLine.match(/CCB<=\s*(\d+)\s*(?:【([^】]+)】|(.+))/i);
     if (match) {
       let skillName = (match[2] ?? match[3] ?? '').trim();
-      if (!skillName || abilityNames.has(skillName)) return;
+      const lastBracketInSkill = skillName.match(/【([^】]+)】\s*$/);
+      if (lastBracketInSkill) {
+        skillName = lastBracketInSkill[1].trim();
+      } else if (trimmedLine.match(/【[^】]+】.*【[^】]+】/)) {
+        const lastBracketInLine = trimmedLine.match(/【([^】]+)】\s*$/);
+        if (lastBracketInLine) {
+          skillName = lastBracketInLine[1].trim();
+        }
+      }
+
+      const abilityLinePattern = /CCB<=\s*\d+\s*(?:\*\s*5)?\s*(?:【\s*)?(STR|CON|POW|DEX|APP|SIZ|INT|EDU)\s*[×xX＊*]\s*5(?:\s*】)?/i;
+      if (
+        !skillName ||
+        isAbilityRoll(skillName) ||
+        abilityLinePattern.test(trimmedLine)
+      ) {
+        return;
+      }
 
       const skillValue = parseInt(match[1]);
       skills[skillName] = skillValue;
