@@ -90,7 +90,7 @@ function optimizePalette(text: string): string {
     '言いくるめ': 5, '信用': 15, '説得': 15, '値切り': 5, '母国語': 0,
     '医学': 5, 'オカルト': 5, '化学': 1, 'クトゥルフ神話': 0, '芸術': 5, '経理': 10, '考古学': 1, 'コンピューター': 1, '心理学': 5, '人類学': 1, '生物学': 1, '地質学': 1, '電子工学': 1, '天文学': 1, '博物学': 10, '物理学': 1, '法律': 5, '薬学': 1, '歴史': 20,
   };
-  
+
   // 1. 全行を解析して能力値と技能を抽出
   const normalizeAbilityName = (name: string) =>
     name
@@ -98,7 +98,7 @@ function optimizePalette(text: string): string {
       .replace(/\*/g, '×')
       .replace(/[xX]/g, '×');
 
-  const abilityKeywords = new Set(['アイデア','幸運','知識'].map(name => normalizeAbilityName(name)));
+  const abilityKeywords = new Set(['アイデア', '幸運', '知識', 'ショックロール'].map(name => normalizeAbilityName(name)));
 
   const isAbilityRoll = (name: string) => {
     const normalized = normalizeAbilityName(name);
@@ -129,17 +129,14 @@ function optimizePalette(text: string): string {
     }
 
     // 通常技能ロール
-    const match = trimmedLine.match(/CCB<=\s*(\d+)\s*(?:【([^】]+)】|(.+))/i);
+    const match = trimmedLine.match(/CCB<=\s*(\d+(?:[\*xX×]\d+)?)\s*(?:【([^】]+)】|(.+))/i);
     if (match) {
       let skillName = (match[2] ?? match[3] ?? '').trim();
-      const lastBracketInSkill = skillName.match(/【([^】]+)】\s*$/);
-      if (lastBracketInSkill) {
-        skillName = lastBracketInSkill[1].trim();
-      } else if (trimmedLine.match(/【[^】]+】.*【[^】]+】/)) {
-        const lastBracketInLine = trimmedLine.match(/【([^】]+)】\s*$/);
-        if (lastBracketInLine) {
-          skillName = lastBracketInLine[1].trim();
-        }
+
+      // 【】で囲まれた部分があれば、それを優先して技能名とする（後ろに注釈があっても対応）
+      const bracketMatch = trimmedLine.match(/【([^】]+)】/);
+      if (bracketMatch) {
+        skillName = bracketMatch[1].trim();
       }
 
       const abilityLinePattern = /CCB<=\s*\d+\s*(?:\*\s*5)?\s*(?:【\s*)?(STR|CON|POW|DEX|APP|SIZ|INT|EDU)\s*[×xX＊*]\s*5(?:\s*】)?/i;
@@ -160,7 +157,7 @@ function optimizePalette(text: string): string {
   const result: string[] = [];
   if (san > 0) result.push("1d100<={SAN} 【正気度ロール】");
   result.push("---");
-  
+
   result.push(`CCB<={STR}*5 【STR×5】`);
   result.push(`CCB<={CON}*5 【CON×5】（ショックロール）`);
   result.push(`CCB<={POW}*5 【POW×5】（幸運）`);
@@ -169,48 +166,48 @@ function optimizePalette(text: string): string {
   result.push(`CCB<={SIZ}*5 【SIZ×5】`);
   result.push(`CCB<={INT}*5 【INT×5】（アイデア）`);
   result.push(`CCB<={EDU}*5 【EDU×5】（知識・母国語）`);
-  
+
   result.push("---");
 
   // 技能を「初期値より高いもの」と「それ以外」に分類
   const grownSkills: string[] = [];
   const otherSkills: string[] = [];
-  
+
   for (const skillName in skills) {
     const value = skills[skillName];
     const normalizedSkillName = normalizeSkillNameForInitial(skillName);
     const initialValue = initialSkills[normalizedSkillName] ?? -1; // 特殊技能《》・（ ）を除外して検索
     const line = `CCB<=${value} 【${skillName}】`;
-    
+
     if (value > initialValue) {
       grownSkills.push(line);
     } else {
       otherSkills.push(line);
     }
   }
-  
+
   result.push(...grownSkills);
   result.push("---");
   result.push(...otherSkills);
   result.push("---");
-  
+
   // こぶし・キックは初期値でも使うため、常に追加
   result.push(`1D3{DB} 【こぶしダメージ判定】`);
   result.push(`1D6{DB} 【キックダメージ判定】`);
 
   // マーシャルアーツは技能値を振っている（初期値1より大きい）場合のみ追加
   if (skills['マーシャルアーツ'] > initialSkills['マーシャルアーツ']) {
-      result.push(`2D3{DB} 【こぶし+マーシャルアーツダメージ判定】`);
-      result.push(`2D6{DB} 【キック+マーシャルアーツダメージ判定】`);
+    result.push(`2D3{DB} 【こぶし+マーシャルアーツダメージ判定】`);
+    result.push(`2D6{DB} 【キック+マーシャルアーツダメージ判定】`);
   }
   // 応急手当は初期値(30)でも使うため、常に追加
   result.push("1D3 【応急手当回復値判定】");
 
   // 医学は技能値を振っている（初期値5より大きい）場合のみ追加
   if (skills['医学'] > initialSkills['医学']) {
-      result.push("2D3 【医学回復値判定】");
+    result.push("2D3 【医学回復値判定】");
   }
-  
+
   result.push("---");
   result.push("CCB<=");
   result.push("---");
@@ -246,7 +243,7 @@ feedbackForm.addEventListener('submit', async (event) => {
     alert('内容を入力してください。');
     return;
   }
-  
+
   // 送信ボタンを無効化して二重送信を防ぐ
   submitButton.disabled = true;
   submitButton.textContent = '送信中...';

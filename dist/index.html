@@ -2,15 +2,29 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="./vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/coc-palette-optimizer/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CoC6版 チャットパレット最適化ツール</title>
-    <script type="module" crossorigin src="./assets/index-BOrYeBuD.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-CbZ7Vm9T.css">
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DHH4KJ2VJ0"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-DHH4KJ2VJ0');
+    </script>
+    <script type="module" crossorigin src="/coc-palette-optimizer/assets/index-C20_J5Td.js"></script>
+    <link rel="stylesheet" crossorigin href="/coc-palette-optimizer/assets/index-BavbUfy_.css">
   </head>
   <body>
     <h1>CoC6版 チャットパレット最適化ツール</h1>
-    <p>「いあきゃら」のチャットパレット出力を貼り付けてください。</p>
+    <div class="notice">
+      <strong>【重要】</strong>「いあきゃら」の出力にはダメージ・ボーナス(DB)が含まれません。<br>
+      ご利用の際は、ココフォリアのキャラクター編集画面で、ご自身のDB（例: <code>+1D4</code>, <code>-1D6</code> など）をパラメータに手動で追加してください。
+    </div>
+    <p>「いあきゃら」、「Charaeno」のチャットパレット出力を貼り付けてください。</p>
     
     <div class="container">
       <div class="editor">
@@ -26,6 +40,26 @@
         <button id="copy-button">クリップボードにコピー</button>
       </div>
     </div>
-
+    <div id="optimize-count">読み込み中...</div>
+    <div class="feedback-section">
+      <details>
+        <summary>不具合報告・改善要望はこちら</summary>
+        <form id="feedback-form">
+          <div class="form-group">
+            <label for="feedback-type">種類</label>
+            <select id="feedback-type" name="type" required>
+              <option value="不具合報告">不具合報告</option>
+              <option value="改善要望">改善要望</option>
+              <option value="その他">その他</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="feedback-content">内容</label>
+            <textarea id="feedback-content" name="content" rows="5" placeholder="具体的な内容をご記入ください" required></textarea>
+          </div>
+          <button type="submit" id="feedback-submit-button">送信</button>
+        </form>
+      </details>
+    </div>
   </body>
 </html>
