@@ -169,6 +169,15 @@ function optimizePalette(text: string): string {
 
   result.push("---");
 
+  // 銃火器の故障ナンバー設定
+  const firearmsMalfunction: { [key: string]: string } = {
+    '拳銃': '00',
+    'サブマシンガン': '98',
+    'ショットガン': '00',
+    'マシンガン': '00',
+    'ライフル': '00',
+  };
+
   // 技能を「初期値より高いもの」と「それ以外」に分類
   const grownSkills: string[] = [];
   const otherSkills: string[] = [];
@@ -177,7 +186,11 @@ function optimizePalette(text: string): string {
     const value = skills[skillName];
     const normalizedSkillName = normalizeSkillNameForInitial(skillName);
     const initialValue = initialSkills[normalizedSkillName] ?? -1; // 特殊技能《》・（ ）を除外して検索
-    const line = `CCB<=${value} 【${skillName}】`;
+
+    // 故障ナンバーの有無を確認
+    const malfunction = firearmsMalfunction[normalizedSkillName];
+    const ccbPrefix = malfunction ? `CCB(${malfunction})` : 'CCB';
+    const line = `${ccbPrefix}<=${value} 【${skillName}】`;
 
     if (value > initialValue) {
       grownSkills.push(line);
