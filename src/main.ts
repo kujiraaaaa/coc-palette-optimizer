@@ -5,31 +5,18 @@ const supabaseUrl = 'https://zjjtdaoieuvakwufisdj.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqanRkYW9pZXV2YWt3dWZpc2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4MDYwMjQsImV4cCI6MjA3NzM4MjAyNH0.a-6wbr7aabX0EutpmM3n_vpuBKzMBXC0Zhok4byRaEM';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// 最適化ボタン回数カウンターをSupabaseで取得・インクリメント・表示
+// 最適化ボタン回数カウンターをSupabaseでインクリメント・表示
 async function incrementAndDisplayOptimizeCount() {
-  const { data, error } = await supabase
-    .from('usage_stats')
-    .select('count')
-    .eq('id', 1)
-    .single();
+  // 作成したデータベース関数（RPC）を呼び出す
+  const { data: newCount, error } = await supabase.rpc('increment_optimize_count');
 
   if (error) {
-    displayOptimizeCountText('カウント取得失敗');
-    return;
-  }
-
-  let currentCount = (data?.count ?? 0) + 1;
-
-  const { error: updateError } = await supabase
-    .from('usage_stats')
-    .update({ count: currentCount })
-    .eq('id', 1);
-
-  if (updateError) {
+    console.error('Count update error:', error);
     displayOptimizeCountText('カウント更新失敗');
     return;
   }
-  displayOptimizeCountText(`最適化ボタンが${currentCount}回押されました`);
+
+  displayOptimizeCountText(`最適化ボタンが${newCount}回押されました`);
 }
 
 function displayOptimizeCountText(text: string) {
