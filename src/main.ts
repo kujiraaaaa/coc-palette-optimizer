@@ -252,7 +252,7 @@ feedbackForm.addEventListener('submit', async (event) => {
   const payload = {
     embeds: [
       {
-        title: `フィードバックを受信しました`,
+        title: `【CoC6チャパレ最適化ツール】フィードバックを受信しました`,
         color: 0x5865F2, // Discordのブランドカラー
         fields: [
           {
