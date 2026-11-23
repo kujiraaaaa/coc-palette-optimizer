@@ -49,7 +49,7 @@ copyButton.addEventListener('click', () => {
 // ページロード時に現在値のみ表示
 (async () => {
   const { data, error } = await supabase
-    .from('usage_stats')
+    .from('usage_stats_coc_palette_optimizer')
     .select('count')
     .eq('id', 1)
     .single();
