@@ -223,8 +223,6 @@ function optimizePalette(text: string): string {
 }
 // --- ここからがフィードバックフォームのロジック ---
 
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1417163291280674826/p0SVn6ZzLfIdvSpvZZC--d9poPjUayLwih3fO2kaVZFoNtR5ymvCiA3GmGB-Hvu1wLOe';
-
 // フィードバックフォームのHTML要素を取得
 const feedbackForm = document.getElementById('feedback-form') as HTMLFormElement;
 const feedbackType = document.getElementById('feedback-type') as HTMLSelectElement;
@@ -237,9 +235,9 @@ feedbackForm.addEventListener('submit', async (event) => {
 
   // 入力値を取得
   const type = feedbackType.value;
-  const content = feedbackContent.value;
+  const content = feedbackContent.value.trim();
 
-  if (!content.trim()) {
+  if (!content) {
     alert('内容を入力してください。');
     return;
   }
@@ -248,49 +246,22 @@ feedbackForm.addEventListener('submit', async (event) => {
   submitButton.disabled = true;
   submitButton.textContent = '送信中...';
 
-  // Discordに送信するデータ（ペイロード）を作成
-  const payload = {
-    embeds: [
-      {
-        title: `【CoC6チャパレ最適化ツール】フィードバックを受信しました`,
-        color: 0x5865F2, // Discordのブランドカラー
-        fields: [
-          {
-            name: '種類',
-            value: type,
-            inline: true,
-          },
-          {
-            name: '内容',
-            value: content,
-          }
-        ],
-        timestamp: new Date().toISOString(),
-      }
-    ]
-  };
-
   try {
-    // fetch APIを使ってDiscordにPOSTリクエストを送信
-    const response = await fetch(DISCORD_WEBHOOK_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
+    // Supabaseのテーブルにフィードバックを保存
+    const { error } = await supabase
+      .from('feedback_coc_palette_optimizer')
+      .insert([{ type, content }]);
 
-    if (response.ok) {
+    if (!error) {
       alert('フィードバックを送信しました。ご協力ありがとうございます！');
       feedbackForm.reset(); // フォームの内容をリセット
     } else {
-      // Discordからのエラーレスポンス
-      console.error('Discord API Error:', await response.json());
+      console.error('Supabase Insert Error:', error);
       alert('送信に失敗しました。時間をおいて再度お試しください。');
     }
   } catch (error) {
     // ネットワークエラーなど
-    console.error('Fetch Error:', error);
+    console.error('Feedback Submit Error:', error);
     alert('送信中にエラーが発生しました。');
   } finally {
     // 成功・失敗にかかわらずボタンを元に戻す
